@@ -16,6 +16,20 @@ var phoneList = [
 //     port: 6379
 // });
 
+const os = {
+    win32: 'Windows',
+    darwin: 'macOS',
+    linux: 'Linux'
+}[process.platform];
+
+let hostname;
+
+if(os == 'Windows'){
+    hostname = process.env.APPIUM_HOST || 'localhost';
+}else if (os == 'Linux'){
+    hostname = '10.210.210.3';
+}
+
 const capabilities = {
     platformName: 'Android',
     'appium:automationName': 'UiAutomator2',
@@ -30,7 +44,7 @@ const capabilities = {
 //webdriver 链接配置
 const wdOpts = {
     //hostname: process.env.APPIUM_HOST || '127.0.0.1',
-    hostname: '10.210.210.3',
+    hostname: hostname,
     //port: parseInt(process.env.APPIUM_PORT, 10) || 4723,
     port: config.appiumPort,
     //path:'/wd/hub',

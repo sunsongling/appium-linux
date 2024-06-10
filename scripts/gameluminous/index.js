@@ -1,15 +1,28 @@
 const {remote} = require('webdriverio');
-const Redis = require('ioredis');
+//const Redis = require('ioredis');
 const app  = require('../../app.js');
 const config = require('./config.js');
 const now = new Date();
 var browser = {};
 var phoneList = config.phoneList;
 
-const redis = new Redis({
-    host: 'localhost',
-    port: 6379
-});
+// const redis = new Redis({
+//     host: 'localhost',
+//     port: 6379
+// });
+const os = {
+    win32: 'Windows',
+    darwin: 'macOS',
+    linux: 'Linux'
+}[process.platform];
+
+let hostname;
+
+if(os == 'Windows'){
+    hostname = process.env.APPIUM_HOST || 'localhost';
+}else if (os == 'Linux'){
+    hostname = '10.210.210.3';
+}
 
 const capabilities = {
     platformName: 'Android',
@@ -24,7 +37,7 @@ const capabilities = {
 };
 //webdriver 链接配置
 const wdOpts = {
-    hostname: process.env.APPIUM_HOST || 'localhost',
+    hostname: hostname,
     //port: parseInt(process.env.APPIUM_PORT, 10) || 4723,
     port: config.appiumPort,
     //path:'/wd/hub',
@@ -325,7 +338,7 @@ const runWeb = async function(){
 
     const body = await browser.$('html body');
 
-    redis.set(config.redisKey,0);
+    //redis.set(config.redisKey,0);
 
     // 获取屏幕尺寸
     const { width, height } = await browser.getWindowSize();
