@@ -21,14 +21,8 @@ const date = now.toLocaleString().split(" ")[0];  // 获取日期部分
 
 var config = {};
 
-//创建日志
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.json(),
-  transports: [
-    new winston.transports.File({filename:'logs/'+date+'.log' })
-  ]
-});
+let logger = {};
+
 
 const hash = (data) => {
   // 使用SHA256算法创建哈希对象
@@ -398,7 +392,15 @@ function proxyBind(title){
 }
 
 function init(_config) {
-    config = _config;
+  config = _config;
+  //创建日志
+  logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    transports: [
+      new winston.transports.File({filename:'logs/'+date+'/'+config.log+'/.log' })
+    ]
+  });
 }
 
 module.exports = {

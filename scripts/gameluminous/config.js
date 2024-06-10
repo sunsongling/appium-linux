@@ -22,5 +22,6 @@ module.exports = {
             brand: 'google',
             model: [ 'Pixel 4a', 'pixel3a', 'pixel5', 'Pixel 6' ]
         }
-    ]
+    ],
+    log:'gameluminous'
 }
