@@ -4,8 +4,8 @@ module.exports = {
     appPackage:'com.android.chrome',
     appActivity:'com.google.android.apps.chrome.Main',
     proxyPort:7778,
-    userName : '101282963125-cRbcQvb2',                            //代理ip 用户名
-    password : 'd2b8d4664c0d08ce980b046cff8007a7',                 //代理ip 密码
+    userName : '01143916431-Wf9QnQpt',                            //代理ip 用户名
+    password : 'f91b4b7c54fe91864cb02b12cd54759f',                 //代理ip 密码
     proxyUrl : 'gate1.ipweb.cc',                                   //代理ip 服务器地址
     // userName :'plu18156',
     // session :'2q6vkcrvh5us',

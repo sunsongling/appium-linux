@@ -29,7 +29,8 @@ const capabilities = {
 };
 //webdriver 链接配置
 const wdOpts = {
-    hostname: process.env.APPIUM_HOST || '127.0.0.1',
+    //hostname: process.env.APPIUM_HOST || '127.0.0.1',
+    hostname: '10.210.210.3',
     //port: parseInt(process.env.APPIUM_PORT, 10) || 4723,
     port: config.appiumPort,
     //path:'/wd/hub',

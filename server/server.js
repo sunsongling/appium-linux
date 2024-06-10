@@ -1,18 +1,18 @@
 const childProcess = require('child_process');
 const winston = require('winston');
-const config = require('./config.js');
-const app  = require('../app.js');
-const Redis = require('ioredis');
+//const config = require('./config.js');
+//const app  = require('../app.js');
+//const Redis = require('ioredis');
 const now = new Date();
 const date = now.toLocaleString().split(" ")[0];  // 获取日期部分
-const redis = new Redis({
-    host: 'localhost',
-    port: 6379
-});
+// const redis = new Redis({
+//     host: 'localhost',
+//     port: 6379
+// });
 // 设置轮询的间隔时间（例如：每5秒钟执行一次）
 const pollInterval = 50000; // 单位为毫秒
 var intervalId = null;
-app.init(config);
+//app.init(config);
 
 function wait(milliSeconds) {
     var startTime = new Date().getTime();
@@ -35,7 +35,7 @@ function runChild(){
         child.kill();
     }
     //子进程
-    child = childProcess.spawn('node',['./scripts/shutugames.js']);
+    child = childProcess.spawn('node',['./scripts/gameluminous/index.js']);
 
     child.stdout.on("data", function (data) {
         // 因为可能会有多次输出，所以需要将数据转换为字符串
@@ -69,6 +69,7 @@ function runChild(){
 
 // pm2 stop all
 // 定义轮询的函数
+/*
 function pollTask() {
     redis.get(config.redisKey).then(function(result){
         if(result >= 5){
@@ -84,7 +85,7 @@ function pollTask() {
         }
     });
 }
- 
+*/
 /*
 function init(){
     redis.set('actionPhone',0);

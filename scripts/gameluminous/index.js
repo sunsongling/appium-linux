@@ -49,13 +49,12 @@ async function runTest() {
 
     wait(2000);
     //切换IP
-    await app.changeIp2();
+    await app.changeIp();
     
     browser = await remote(wdOpts);
 
     try {
-        await browser.pause(5000);
-
+        await browser.pause(8000);
 
         const useAccount = await browser.$('//android.widget.Button[@resource-id="com.android.chrome:id/signin_fre_dismiss_button"]');
         let useAccountExisting = await useAccount.isExisting();
@@ -189,7 +188,7 @@ const closeWeb = async function (){
     
         wait(2000);
         //切换IP
-        await app.changeIp2();
+        await app.changeIp();
         
 
         // 切换到最后一个窗口并打开新页面
@@ -206,7 +205,7 @@ const closeWeb = async function (){
     
         wait(2000);
         //切换IP
-        await app.changeIp2();
+        await app.changeIp();
 
         app.logger.error(err);
 
@@ -219,6 +218,11 @@ const gotoAdver = async function(adver,type){
 
     // 等待页面加载并获取 iframe 元素
     const iframe = await adver.$('iframe');
+    let existing = await iframe.isExisting();
+    if(!existing){
+        closeWeb();
+        return ;
+    }
     await iframe.waitForExist({ timeout: 5000 }); // 等待元素存在
     await iframe.waitForDisplayed({ timeout: 5000 }); // 等待元素显示
 

@@ -4,7 +4,7 @@ const crypto = require('crypto');
 //const Redis = require('ioredis');
 //const NodeCache = require("node-cache");
 
-const token = 'ASRN570R0UMNE5ZJUZ2696X2E39GI86K';                     //代理ip token
+const token = 'X3QCBMRK5BOT5KM4SLJPUJDX5VN9USSZ';                     //代理ip token
 const ipweb = 'http://api.ipweb.cc:8004/api/agent/release?account=';  //代理ip 切换ip api
 const ipweb2 = 'http://changeip.proxylink.net/changeAccountSession?sn=d3c33d5bc0438731e2021f6cf7fe4e1e&account=';  //代理ip 切换ip api
 const AK = '206adee0788f6e0e614260592f2cd0a3';    //云机秘钥
