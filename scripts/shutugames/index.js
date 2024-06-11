@@ -55,12 +55,12 @@ function redisAdd() {
             redis.set(config.project+'ErrorNum',result);
             if(result > config.allowError){
                 (async () => {
-                    await app.actionPhone(); //重启云机
-                    wait(120000);
+                    //await app.actionPhone(); //重启云机
+                    //wait(120000);
                     await app.stopRaw();
-                    wait(2000);
+                    wait(5000);
                     await app.startRaw();
-                    wait(2000);
+                    wait(30000);
                     redis.set(config.project+'ErrorNum',0);
                     resolve(1);
                 })(); 

@@ -409,11 +409,10 @@ function adbStatus(){
   return new Promise((resolve,reject) => {
     // 执行 pm2 restart raw 命令
 		let {code,stdout,stderr} = shell.exec('adb devices');
-    myLogger.info('pm2 restart raw Exit code:', code);
-		myLogger.info('pm2 restart raw Program output:\n', stdout);
-		myLogger.info('pm2 restart raw Program stderr:\n', stderr);
-    
     if(stdout.indexOf(config.deviceName + '  device') == -1){
+      myLogger.info('pm2 restart raw Exit code:', code);
+		  myLogger.info('pm2 restart raw Program output:\n', stdout);
+		  myLogger.info('pm2 restart raw Program stderr:\n', stderr);
       resolve(0);
     }else{
       resolve(1);
