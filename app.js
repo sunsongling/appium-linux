@@ -395,36 +395,29 @@ function stopRaw (){
 //启用 raw 
 function startRaw (){
   return new Promise((resolve,reject) => {
-    if(os == 'Windows'){
-        // 执行 pm2 stop raw 命令
-        let {code,stdout,stderr} = shell.exec(__dirname + '/RawTcpTunnelConnector-amd64-windows.exe config=./config.json');
-        myLogger.info('RawTcpTunnelConnector-amd64-windows Exit code:', code);
-        myLogger.info('RawTcpTunnelConnector-amd64-windows Program output:\n', stdout);
-        myLogger.info('RawTcpTunnelConnector-amd64-windows Program stderr:\n', stderr);
-    }else{
-        // 执行 pm2 stop raw 命令
-        let {code,stdout,stderr} = shell.exec(__dirname + '/RawTcpTunnelConnector-amd64-linux config=./config.json');
-        myLogger.info('RawTcpTunnelConnector-amd64-linux Exit code:', code);
-        myLogger.info('RawTcpTunnelConnector-amd64-linux Program output:\n', stdout);
-        myLogger.info('RawTcpTunnelConnector-amd64-linux Program stderr:\n', stderr);
-    }
+    // 执行 pm2 restart raw 命令
+		let {code,stdout,stderr} = shell.exec('pm2 restart raw');
+    myLogger.info('pm2 restart raw Exit code:', code);
+		myLogger.info('pm2 restart raw Program output:\n', stdout);
+		myLogger.info('pm2 restart raw Program stderr:\n', stderr);
+    resolve(1);
+  })
+}
 
-    fs.readFile('config.json', 'utf8', (err, data) => {
-      if (err) {
-        console.error('Error reading file:', err);
-        return;
-      }
-      try {
-        // 将文件内容解析为 JSON 对象 conn_map
-        const jsonData = JSON.parse(data);
-        for(let k in jsonData.conn_map){
-          shell.exec('adb connect '+k);
-        }
-        resolve(1);
-      } catch (error) {
-        console.error('Error parsing JSON:', error);
-      }
-    });
+//检测adb链接状态
+function adbStatus(){
+  return new Promise((resolve,reject) => {
+    // 执行 pm2 restart raw 命令
+		let {code,stdout,stderr} = shell.exec('adb devices');
+    myLogger.info('pm2 restart raw Exit code:', code);
+		myLogger.info('pm2 restart raw Program output:\n', stdout);
+		myLogger.info('pm2 restart raw Program stderr:\n', stderr);
+    
+    if(stdout.indexOf(config.deviceName + '  device') == -1){
+      resolve(0);
+    }else{
+      resolve(1);
+    }
   })
 }
 
@@ -449,5 +442,6 @@ module.exports = {
     addProxy:addProxy,
     stopRaw:stopRaw,
     startRaw:startRaw,
+    adbStatus:adbStatus,
     init:init
 }

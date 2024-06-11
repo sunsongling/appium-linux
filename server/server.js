@@ -1,6 +1,6 @@
 const childProcess = require('child_process');
 const fs = require('fs');
-const logger = require('./logger.js');
+const logger = require('../logger.js');
 const minimist = require('minimist');
 // 解析参数
 const args = minimist(process.argv.slice(2));
