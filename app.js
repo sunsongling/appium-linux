@@ -420,6 +420,37 @@ function adbStatus(){
   })
 }
 
+function wait(milliSeconds) {
+  var startTime = new Date().getTime();
+  while (new Date().getTime() < startTime + milliSeconds);
+}
+
+function redisAdd() {
+  return new Promise((resolve, reject) => {
+      redis.get(config.project+'ErrorNum').then(function(result){
+          result = Number(result);
+          if(result <= 0){
+            result = 0;
+          }
+          result++;
+          redis.set(config.project+'ErrorNum',result);
+          if(result > config.allowError){
+              (async () => {
+                  await actionPhone(); //重启云机
+                  wait(120000);
+                  await stopRaw();
+                  wait(5000);
+                  await startRaw();
+                  wait(30000);
+                  redis.set(config.project+'ErrorNum',0);
+                  resolve(1);
+              })(); 
+          }else{
+              resolve(1);
+          }
+      });
+  });
+}
 
 function init(_config) {
   config = _config;
@@ -439,8 +470,7 @@ module.exports = {
     proxyList:proxyList,
     proxyBind:proxyBind,
     addProxy:addProxy,
-    stopRaw:stopRaw,
-    startRaw:startRaw,
+    redisAdd:redisAdd,
     adbStatus:adbStatus,
     init:init
 }

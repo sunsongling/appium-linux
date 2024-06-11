@@ -44,32 +44,6 @@ function wait(milliSeconds) {
     while (new Date().getTime() < startTime + milliSeconds);
 }
 
-function redisAdd() {
-    return new Promise((resolve, reject) => {
-        redis.get(config.project+'ErrorNum').then(function(result){
-            result = Number(result);
-            if(result <= 0){
-              result = 0;
-            }
-            result++;
-            redis.set(config.project+'ErrorNum',result);
-            if(result > config.allowError){
-                (async () => {
-                    //await app.actionPhone(); //重启云机
-                    //wait(120000);
-                    await app.stopRaw();
-                    wait(5000);
-                    await app.startRaw();
-                    wait(30000);
-                    redis.set(config.project+'ErrorNum',0);
-                    resolve(1);
-                })(); 
-            }else{
-                resolve(1);
-            }
-        });
-    });
-}
 
 async function runTest() {
     app.init(config);
@@ -77,7 +51,7 @@ async function runTest() {
     //获取机型列表
     //phoneList = await app.resourceList();
 
-    await redisAdd();
+    await app.redisAdd();
     //随机获取机型
     let phone = phoneList[Math.floor(Math.random()*phoneList.length)];
     let model = phone.model[Math.floor(Math.random()*phone.model.length)];
@@ -216,7 +190,7 @@ const closeWeb = async function (){
             }
         }
         
-        await redisAdd();
+        await app.redisAdd();
         //随机获取机型
         let phone = phoneList[Math.floor(Math.random()*phoneList.length)];
         let model = phone.model[Math.floor(Math.random()*phone.model.length)];
@@ -234,7 +208,7 @@ const closeWeb = async function (){
         runWeb();
     } catch(err) {
 
-        await redisAdd();
+        await app.redisAdd();
         //随机获取机型
         let phone = phoneList[Math.floor(Math.random()*phoneList.length)];
         let model = phone.model[Math.floor(Math.random()*phone.model.length)];
