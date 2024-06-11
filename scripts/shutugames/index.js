@@ -1,5 +1,5 @@
 const {remote} = require('webdriverio');
-//const Redis = require('ioredis');
+const Redis = require('ioredis');
 const app  = require('../../app.js');
 const config = require('./config.js');
 const now = new Date();
@@ -11,24 +11,11 @@ var phoneList = [
     }
 ];
 
-// const redis = new Redis({
-//     host: 'localhost',
-//     port: 6379
-// });
+const redis = new Redis({
+    host: 'localhost',
+    port: 6379
+});
 
-const os = {
-    win32: 'Windows',
-    darwin: 'macOS',
-    linux: 'Linux'
-}[process.platform];
-
-let hostname;
-
-if(os == 'Windows'){
-    hostname = process.env.APPIUM_HOST || 'localhost';
-}else if (os == 'Linux'){
-    hostname = '10.210.210.3';
-}
 
 const capabilities = {
     platformName: 'Android',
@@ -44,7 +31,7 @@ const capabilities = {
 //webdriver 链接配置
 const wdOpts = {
     //hostname: process.env.APPIUM_HOST || '127.0.0.1',
-    hostname: hostname,
+    hostname: app.hostname,
     //port: parseInt(process.env.APPIUM_PORT, 10) || 4723,
     port: config.appiumPort,
     //path:'/wd/hub',
@@ -57,14 +44,40 @@ function wait(milliSeconds) {
     while (new Date().getTime() < startTime + milliSeconds);
 }
 
+function redisAdd() {
+    return new Promise((resolve, reject) => {
+        redis.get(config.project+'ErrorNum').then(function(result){
+            result = Number(result);
+            if(result <= 0){
+              result = 0;
+            }
+            result++;
+            redis.set(config.project+'ErrorNum',result);
+            if(result > config.allowError){
+                (async () => {
+                    await app.actionPhone(); //重启云机
+                    wait(120000);
+                    await app.stopRaw();
+                    wait(2000);
+                    await app.startRaw();
+                    wait(2000);
+                    redis.set(config.project+'ErrorNum',0);
+                    resolve(1);
+                })(); 
+            }else{
+                resolve(1);
+            }
+        });
+    });
+}
+
 async function runTest() {
     app.init(config);
     app.logger.info('开始：'+now.toLocaleString());
-
     //获取机型列表
     //phoneList = await app.resourceList();
 
-
+    await redisAdd();
     //随机获取机型
     let phone = phoneList[Math.floor(Math.random()*phoneList.length)];
     let model = phone.model[Math.floor(Math.random()*phone.model.length)];
@@ -79,7 +92,6 @@ async function runTest() {
     try {
         await browser.pause(5000);
 
-
         const useAccount = await browser.$('//android.widget.Button[@resource-id="com.android.chrome:id/signin_fre_dismiss_button"]');
         let useAccountExisting = await useAccount.isExisting();
         if(useAccountExisting){
@@ -88,7 +100,6 @@ async function runTest() {
             await useAccount.click();
             await browser.pause(1000);
         }
-        
         
         const moreButton = await browser.$('//android.widget.Button[@resource-id="com.android.chrome:id/more_button"]');
         let moreButtonExisting = await moreButton.isExisting();
@@ -205,6 +216,7 @@ const closeWeb = async function (){
             }
         }
         
+        await redisAdd();
         //随机获取机型
         let phone = phoneList[Math.floor(Math.random()*phoneList.length)];
         let model = phone.model[Math.floor(Math.random()*phone.model.length)];
@@ -222,6 +234,7 @@ const closeWeb = async function (){
         runWeb();
     } catch(err) {
 
+        await redisAdd();
         //随机获取机型
         let phone = phoneList[Math.floor(Math.random()*phoneList.length)];
         let model = phone.model[Math.floor(Math.random()*phone.model.length)];
@@ -344,7 +357,7 @@ const runWeb = async function(){
 
     const body = await browser.$('html body');
 
-    //redis.set(config.redisKey,0);
+    redis.set(config.project+'ErrorNum',0);
 
     // 获取屏幕尺寸
     const { width, height } = await browser.getWindowSize();

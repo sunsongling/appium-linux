@@ -14,5 +14,6 @@ module.exports = {
     openChild: 70,                                                  //打开二级页面概率
     device_id: 'VM010010008056',                                   //云机ID
     availability_zone: 5,                                          //云机所在区
-    redisKey:'fillNum'
+    allowError:5,
+    project:'shutugames',
 }

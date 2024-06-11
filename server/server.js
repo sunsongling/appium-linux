@@ -1,32 +1,18 @@
 const childProcess = require('child_process');
-const winston = require('winston');
-//const config = require('./config.js');
-//const app  = require('../app.js');
-//const Redis = require('ioredis');
-const now = new Date();
-const date = now.toLocaleString().split(" ")[0];  // 获取日期部分
-// const redis = new Redis({
-//     host: 'localhost',
-//     port: 6379
-// });
-// 设置轮询的间隔时间（例如：每5秒钟执行一次）
-const pollInterval = 50000; // 单位为毫秒
-var intervalId = null;
-//app.init(config);
+const fs = require('fs');
+const logger = require('./logger.js');
+const minimist = require('minimist');
+// 解析参数
+const args = minimist(process.argv.slice(2));
+const project = args['pro'];
+const filePath = '../scripts/'+project+'/index.js';
 
-function wait(milliSeconds) {
-    var startTime = new Date().getTime();
-    while (new Date().getTime() < startTime + milliSeconds);
+if (!fs.existsSync(filePath)) {
+    console.error('File does not exist');
+    return;
 }
 
-
-const loggerChild = winston.createLogger({
-    level: 'info',
-    format: winston.format.json(),
-    transports: [
-        new winston.transports.File({ filename:'./logs/'+date+'/child.log' })
-    ]
-});
+const infoLog  = new logger(project,'server');
 
 let child = null;
 
@@ -35,16 +21,14 @@ function runChild(){
         child.kill();
     }
     //子进程
-    child = childProcess.spawn('node',['./scripts/gameluminous/index.js']);
+    child = childProcess.spawn('node',[filePath]);
 
     child.stdout.on("data", function (data) {
         // 因为可能会有多次输出，所以需要将数据转换为字符串
         const output = data.toString();
-        
         // 逐行输出
-        
         output.split('\n').forEach((line) => {
-            loggerChild.info((new Date()).toLocaleString()+' '+ line);
+            infoLog.info((new Date()).toLocaleString()+' '+ line);
         });
     
     });
@@ -56,45 +40,22 @@ function runChild(){
         
         // 逐行输出
         output.split('\n').forEach((line) => {
-            loggerChild.error((new Date()).toLocaleString()+' '+ line);
+            infoLog.error((new Date()).toLocaleString()+' '+ line);
         });
     });
 
     child.on("close", function (code) {
-        loggerChild.error((new Date()).toLocaleString()+"child exists with code: "+ code);
-        // 重启子进程
-        runChild();
+        infoLog.error((new Date()).toLocaleString()+"child exists with code: "+ code);
+        runChild(); // 重新启动子进程
     });
-}
 
-// pm2 stop all
-// 定义轮询的函数
-/*
-function pollTask() {
-    redis.get(config.redisKey).then(function(result){
-        if(result >= 5){
-            loggerChild.info((new Date()).toLocaleString()+' 连续出错'+ result);
-            redis.set(config.redisKey,0);
-            if(intervalId != null){
-                clearInterval(intervalId);
-            }
-            redis.set('actionPhone',1);
-            app.actionPhone();
-            wait(600000); //等600秒
-            init();
+    child.on('exit', (code, signal) => {
+        if (code !== 0) {
+          infoLog.error((new Date()).toLocaleString()+`Child process exited with code ${code}, restarting...`);
+            runChild(); // 重新启动子进程
         }
     });
 }
-*/
-/*
-function init(){
-    redis.set('actionPhone',0);
-    runChild();
-
-    // 启动轮询任务
-    intervalId = setInterval(pollTask, pollInterval);
-}
-*/
 
 runChild();
 

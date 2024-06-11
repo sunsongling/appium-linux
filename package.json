@@ -17,11 +17,14 @@
     "child_process": "^1.0.2",
     "crypto": "^1.0.1",
     "ioredis": "^5.4.1",
+    "minimist": "^1.2.8",
     "node-cache": "^5.1.2",
     "pm2": "^5.4.0",
     "request": "^2.88.2",
+    "shelljs": "^0.8.5",
     "sync-request": "^6.1.0",
     "winston": "^3.13.0",
+    "winston-daily-rotate-file": "^5.0.0",
     "xlsx": "^0.18.5"
   }
 }

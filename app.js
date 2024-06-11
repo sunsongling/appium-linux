@@ -1,8 +1,8 @@
 const request  = require('request');
-const winston = require('winston');
 const crypto = require('crypto');
-//const Redis = require('ioredis');
-//const NodeCache = require("node-cache");
+const logger = require('./logger.js');
+const shell = require('shelljs');
+const fs = require('fs');
 
 const token = 'X3QCBMRK5BOT5KM4SLJPUJDX5VN9USSZ';                     //代理ip token
 const ipweb = 'http://api.ipweb.cc:8004/api/agent/release?account=';  //代理ip 切换ip api
@@ -10,19 +10,24 @@ const ipweb2 = 'http://changeip.proxylink.net/changeAccountSession?sn=d3c33d5bc0
 const AK = '206adee0788f6e0e614260592f2cd0a3';    //云机秘钥
 const email = '18937153620@163.com';              //云机注册邮箱
 const domain = 'https://www.ogcloud.com/api/';         //云机官网
-// const redis = new Redis({
-//   host: 'localhost',
-//   port: 6379
-// });
 
-//const cache = new NodeCache();
-const now = new Date();
-const date = now.toLocaleString().split(" ")[0];  // 获取日期部分
+const os = {
+  win32: 'Windows',
+  darwin: 'macOS',
+  linux: 'Linux'
+}[process.platform];
+
+let hostname;
+
+if(os == 'Windows'){
+  hostname = process.env.APPIUM_HOST || 'localhost';
+}else if (os == 'Linux'){
+  hostname = '10.210.210.3';
+}
 
 var config = {};
 
-let logger = {};
-
+let myLogger = {};
 
 const hash = (data) => {
   // 使用SHA256算法创建哈希对象
@@ -53,11 +58,11 @@ function changeIp(){
   return new Promise((resolve, reject) => {
     return request(options, function(error, response, body) {
       if (error) {
-        logger.error({'tip':'切换代理IP出错','error':error});
+        myLogger.error({'tip':'切换代理IP出错','error':error});
         resolve(0);
         return;
       }
-      logger.info({'tip':'切换代理IP成功','data':body});
+      myLogger.info({'tip':'切换代理IP成功','data':body});
       resolve(1);
     });
   });
@@ -73,10 +78,10 @@ function changeIp2(){
     return request(options, function(error, response, body) {
       let bodyObj = JSON.parse(body);
       if(bodyObj.code == 0){
-        logger.info({'tip':'切换代理IP成功','data':body});
+        myLogger.info({'tip':'切换代理IP成功','data':body});
         resolve(1);
       }else{
-        logger.error({'tip':'切换代理IP出错','error':error,'data':body});
+        myLogger.error({'tip':'切换代理IP出错','error':error,'data':body});
         resolve(0);
         return;
       }
@@ -132,15 +137,15 @@ function actionPhone(){
     return request(options, function(error, response, body) {
       let bodyObj = JSON.parse(body);
       if(bodyObj.code == 200){
-        logger.info({'tip':'重启云机成功','body':body});
+        myLogger.info({'tip':'重启云机成功','body':body});
         resolve(1);
         return;
       }else if (error) {
-        logger.error({'tip':'重启云机出错','error':error});
+        myLogger.error({'tip':'重启云机出错','error':error});
         resolve(0);
         return;
       } else {
-        logger.error({'tip':'重启云机出错','body':body});
+        myLogger.error({'tip':'重启云机出错','body':body});
         resolve(0);
         return;
       }
@@ -167,16 +172,16 @@ function resourceList(){
     return request(options, function(error, response, body) {
       let bodyObj = JSON.parse(body);
       if(bodyObj.code == 200){
-        logger.info(body);
+        myLogger.info(body);
         let phoneList = bodyObj.data;
         resolve(phoneList);
         return;
       }else if (error) {
-        logger.error({'tip':'获取机型列表出错','error':error});
+        myLogger.error({'tip':'获取机型列表出错','error':error});
         resolve(0);
         return;
       } else {
-        logger.error({'tip':'获取机型列表出错','body':body});
+        myLogger.error({'tip':'获取机型列表出错','body':body});
         resolve(0);
         return;
       }
@@ -186,15 +191,7 @@ function resourceList(){
 
 //切换设备型号
 function changeModel(brand,model,simInfo='美国'){
-  // redis.get(config.redisKey).then(function(result){
-  //   result = Number(result);
-  //   if(result <= 0){
-  //     result = 0;
-  //   }
-  //   result++;
-  //   redis.set(config.redisKey,result);
-  // });
-  
+
   const headers = getHeaders();
   const data = {
     "action": "change_model",
@@ -213,26 +210,18 @@ function changeModel(brand,model,simInfo='美国'){
   };
 
   return new Promise((resolve, reject) => {
-    // let modifyModel = cache.get('modifyModel');
-    // if(modifyModel != null){
-    //   resolve(0);
-    //   return ;
-    // }
     return request(options, function(error, response, body) {
       let bodyObj = JSON.parse(body);
       if(bodyObj.code == 200){
-        logger.info({'tip':'重置机型成功','brand':brand,'model':model,'body':body});
-        //let timestamp = Date.now();
-        //设置更换机型请时间
-        //cache.set('modifyModel',timestamp,30);
+        myLogger.info({'tip':'重置机型成功','brand':brand,'model':model,'body':body});
         resolve(1);
         return;
       }else if (error) {
-        logger.error({'tip':'重置机型出错','error':error});
+        myLogger.error({'tip':'重置机型出错','error':error});
         resolve(0);
         return;
       } else {
-        logger.error({'tip':'重置机型出错','body':body});
+        myLogger.error({'tip':'重置机型出错','body':body});
         resolve(0);
         return;
       }
@@ -263,15 +252,15 @@ function openRoot(){
     return request(options, function(error, response, body) {
       let bodyObj = JSON.parse(body);
       if(bodyObj.code == 200){
-        logger.info({'tip':'打开root成功','body':body});
+        myLogger.info({'tip':'打开root成功','body':body});
         resolve(1);
         return;
       }else if (error) {
-        logger.error({'tip':'打开root出错','error':error});
+        myLogger.error({'tip':'打开root出错','error':error});
         resolve(0);
         return;
       } else {
-        logger.error({'tip':'打开root出错','body':body});
+        myLogger.error({'tip':'打开root出错','body':body});
         resolve(0);
         return;
       }
@@ -303,15 +292,15 @@ function addProxy(){
     return request(options, function(error, response, body) {
       let bodyObj = JSON.parse(body);
       if(bodyObj.code == 200){
-        logger.info({'tip':'添加proxy列表成功','body':body});
+        myLogger.info({'tip':'添加proxy列表成功','body':body});
         resolve(1);
         return;
       }else if (error) {
-        logger.error({'tip':'添加proxy列表出错','error':error});
+        myLogger.error({'tip':'添加proxy列表出错','error':error});
         resolve(0);
         return;
       } else {
-        logger.error({'tip':'添加proxy列表出错','body':body});
+        myLogger.error({'tip':'添加proxy列表出错','body':body});
         resolve(0);
         return;
       }
@@ -338,15 +327,15 @@ function proxyList(){
     return request(options, function(error, response, body) {
       let bodyObj = JSON.parse(body);
       if(bodyObj.code == 200){
-        logger.info({'tip':'获取proxy列表成功','body':body});
+        myLogger.info({'tip':'获取proxy列表成功','body':body});
         resolve(body);
         return;
       }else if (error) {
-        logger.error({'tip':'获取proxy列表出错','error':error});
+        myLogger.error({'tip':'获取proxy列表出错','error':error});
         resolve(0);
         return;
       } else {
-        logger.error({'tip':'获取proxy列表出错','body':body});
+        myLogger.error({'tip':'获取proxy列表出错','body':body});
         resolve(0);
         return;
       }
@@ -375,15 +364,15 @@ function proxyBind(title){
     return request(options, function(error, response, body) {
       let bodyObj = JSON.parse(body);
       if(bodyObj.code == 200){
-        logger.info({'tip':'绑定proxy列表成功','body':body});
+        myLogger.info({'tip':'绑定proxy列表成功','body':body});
         resolve(1);
         return;
       }else if (error) {
-        logger.error({'tip':'绑定proxy列表出错','error':error});
+        myLogger.error({'tip':'绑定proxy列表出错','error':error});
         resolve(0);
         return;
       } else {
-        logger.error({'tip':'绑定proxy列表出错','body':body});
+        myLogger.error({'tip':'绑定proxy列表出错','body':body});
         resolve(0);
         return;
       }
@@ -391,20 +380,64 @@ function proxyBind(title){
   });
 }
 
+//停止 raw 
+function stopRaw (){
+  return new Promise((resolve,reject) => {
+    // 执行 pm2 stop raw 命令
+		let {code,stdout,stderr} = shell.exec('pm2 stop raw');
+    myLogger.info('pm2 stop raw Exit code:', code);
+		myLogger.info('pm2 stop raw Program output:\n', stdout);
+		myLogger.info('pm2 stop raw Program stderr:\n', stderr);
+    resolve(1);
+  })
+}
+
+//启用 raw 
+function startRaw (){
+  return new Promise((resolve,reject) => {
+    if(os == 'Windows'){
+        // 执行 pm2 stop raw 命令
+        let {code,stdout,stderr} = shell.exec(__dirname + '/RawTcpTunnelConnector-amd64-windows.exe config=./config.json');
+        myLogger.info('RawTcpTunnelConnector-amd64-windows Exit code:', code);
+        myLogger.info('RawTcpTunnelConnector-amd64-windows Program output:\n', stdout);
+        myLogger.info('RawTcpTunnelConnector-amd64-windows Program stderr:\n', stderr);
+    }else{
+        // 执行 pm2 stop raw 命令
+        let {code,stdout,stderr} = shell.exec(__dirname + '/RawTcpTunnelConnector-amd64-linux config=./config.json');
+        myLogger.info('RawTcpTunnelConnector-amd64-linux Exit code:', code);
+        myLogger.info('RawTcpTunnelConnector-amd64-linux Program output:\n', stdout);
+        myLogger.info('RawTcpTunnelConnector-amd64-linux Program stderr:\n', stderr);
+    }
+
+    fs.readFile('config.json', 'utf8', (err, data) => {
+      if (err) {
+        console.error('Error reading file:', err);
+        return;
+      }
+      try {
+        // 将文件内容解析为 JSON 对象 conn_map
+        const jsonData = JSON.parse(data);
+        for(let k in jsonData.conn_map){
+          shell.exec('adb connect '+k);
+        }
+        resolve(1);
+      } catch (error) {
+        console.error('Error parsing JSON:', error);
+      }
+    });
+  })
+}
+
+
 function init(_config) {
   config = _config;
   //创建日志
-  logger = winston.createLogger({
-    level: 'info',
-    format: winston.format.json(),
-    transports: [
-      new winston.transports.File({filename:'logs/'+date+'/'+config.log+'/.log' })
-    ]
-  });
+  myLogger = new logger(config.project,'script');
 }
 
 module.exports = {
-    logger:logger,
+    logger:myLogger,
+    hostname:hostname,
     actionPhone:actionPhone,
     changeIp:changeIp,
     changeIp2:changeIp2,
@@ -414,5 +447,7 @@ module.exports = {
     proxyList:proxyList,
     proxyBind:proxyBind,
     addProxy:addProxy,
+    stopRaw:stopRaw,
+    startRaw:startRaw,
     init:init
 }
