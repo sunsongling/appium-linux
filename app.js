@@ -27,7 +27,7 @@ if(os == 'Windows'){
 
 var config = {};
 
-let myLogger = {};
+var myLogger = {};
 
 const hash = (data) => {
   // 使用SHA256算法创建哈希对象
@@ -58,11 +58,11 @@ function changeIp(){
   return new Promise((resolve, reject) => {
     return request(options, function(error, response, body) {
       if (error) {
-        myLogger.error({'tip':'切换代理IP出错','error':error});
+        myLogger.logger.error({'tip':'切换代理IP出错','error':error});
         resolve(0);
         return;
       }
-      myLogger.info({'tip':'切换代理IP成功','data':body});
+      myLogger.logger.info({'tip':'切换代理IP成功','data':body});
       resolve(1);
     });
   });
@@ -78,10 +78,10 @@ function changeIp2(){
     return request(options, function(error, response, body) {
       let bodyObj = JSON.parse(body);
       if(bodyObj.code == 0){
-        myLogger.info({'tip':'切换代理IP成功','data':body});
+        myLogger.logger.info({'tip':'切换代理IP成功','data':body});
         resolve(1);
       }else{
-        myLogger.error({'tip':'切换代理IP出错','error':error,'data':body});
+        myLogger.logger.error({'tip':'切换代理IP出错','error':error,'data':body});
         resolve(0);
         return;
       }
@@ -137,15 +137,15 @@ function actionPhone(){
     return request(options, function(error, response, body) {
       let bodyObj = JSON.parse(body);
       if(bodyObj.code == 200){
-        myLogger.info({'tip':'重启云机成功','body':body});
+        myLogger.logger.info({'tip':'重启云机成功','body':body});
         resolve(1);
         return;
       }else if (error) {
-        myLogger.error({'tip':'重启云机出错','error':error});
+        myLogger.logger.error({'tip':'重启云机出错','error':error});
         resolve(0);
         return;
       } else {
-        myLogger.error({'tip':'重启云机出错','body':body});
+        myLogger.logger.error({'tip':'重启云机出错','body':body});
         resolve(0);
         return;
       }
@@ -172,16 +172,16 @@ function resourceList(){
     return request(options, function(error, response, body) {
       let bodyObj = JSON.parse(body);
       if(bodyObj.code == 200){
-        myLogger.info(body);
+        myLogger.logger.info(body);
         let phoneList = bodyObj.data;
         resolve(phoneList);
         return;
       }else if (error) {
-        myLogger.error({'tip':'获取机型列表出错','error':error});
+        myLogger.logger.error({'tip':'获取机型列表出错','error':error});
         resolve(0);
         return;
       } else {
-        myLogger.error({'tip':'获取机型列表出错','body':body});
+        myLogger.logger.error({'tip':'获取机型列表出错','body':body});
         resolve(0);
         return;
       }
@@ -213,15 +213,15 @@ function changeModel(brand,model,simInfo='美国'){
     return request(options, function(error, response, body) {
       let bodyObj = JSON.parse(body);
       if(bodyObj.code == 200){
-        myLogger.info({'tip':'重置机型成功','brand':brand,'model':model,'body':body});
+        myLogger.logger.info({'tip':'重置机型成功','brand':brand,'model':model,'body':body});
         resolve(1);
         return;
       }else if (error) {
-        myLogger.error({'tip':'重置机型出错','error':error});
+        myLogger.logger.error({'tip':'重置机型出错','error':error});
         resolve(0);
         return;
       } else {
-        myLogger.error({'tip':'重置机型出错','body':body});
+        myLogger.logger.error({'tip':'重置机型出错','body':body});
         resolve(0);
         return;
       }
@@ -252,15 +252,15 @@ function openRoot(){
     return request(options, function(error, response, body) {
       let bodyObj = JSON.parse(body);
       if(bodyObj.code == 200){
-        myLogger.info({'tip':'打开root成功','body':body});
+        myLogger.logger.info({'tip':'打开root成功','body':body});
         resolve(1);
         return;
       }else if (error) {
-        myLogger.error({'tip':'打开root出错','error':error});
+        myLogger.logger.error({'tip':'打开root出错','error':error});
         resolve(0);
         return;
       } else {
-        myLogger.error({'tip':'打开root出错','body':body});
+        myLogger.logger.error({'tip':'打开root出错','body':body});
         resolve(0);
         return;
       }
@@ -292,15 +292,15 @@ function addProxy(){
     return request(options, function(error, response, body) {
       let bodyObj = JSON.parse(body);
       if(bodyObj.code == 200){
-        myLogger.info({'tip':'添加proxy列表成功','body':body});
+        myLogger.logger.info({'tip':'添加proxy列表成功','body':body});
         resolve(1);
         return;
       }else if (error) {
-        myLogger.error({'tip':'添加proxy列表出错','error':error});
+        myLogger.logger.error({'tip':'添加proxy列表出错','error':error});
         resolve(0);
         return;
       } else {
-        myLogger.error({'tip':'添加proxy列表出错','body':body});
+        myLogger.logger.error({'tip':'添加proxy列表出错','body':body});
         resolve(0);
         return;
       }
@@ -327,15 +327,15 @@ function proxyList(){
     return request(options, function(error, response, body) {
       let bodyObj = JSON.parse(body);
       if(bodyObj.code == 200){
-        myLogger.info({'tip':'获取proxy列表成功','body':body});
+        myLogger.logger.info({'tip':'获取proxy列表成功','body':body});
         resolve(body);
         return;
       }else if (error) {
-        myLogger.error({'tip':'获取proxy列表出错','error':error});
+        myLogger.logger.error({'tip':'获取proxy列表出错','error':error});
         resolve(0);
         return;
       } else {
-        myLogger.error({'tip':'获取proxy列表出错','body':body});
+        myLogger.logger.error({'tip':'获取proxy列表出错','body':body});
         resolve(0);
         return;
       }
@@ -364,15 +364,15 @@ function proxyBind(title){
     return request(options, function(error, response, body) {
       let bodyObj = JSON.parse(body);
       if(bodyObj.code == 200){
-        myLogger.info({'tip':'绑定proxy列表成功','body':body});
+        myLogger.logger.info({'tip':'绑定proxy列表成功','body':body});
         resolve(1);
         return;
       }else if (error) {
-        myLogger.error({'tip':'绑定proxy列表出错','error':error});
+        myLogger.logger.error({'tip':'绑定proxy列表出错','error':error});
         resolve(0);
         return;
       } else {
-        myLogger.error({'tip':'绑定proxy列表出错','body':body});
+        myLogger.logger.error({'tip':'绑定proxy列表出错','body':body});
         resolve(0);
         return;
       }
@@ -385,9 +385,9 @@ function stopRaw (){
   return new Promise((resolve,reject) => {
     // 执行 pm2 stop raw 命令
 		let {code,stdout,stderr} = shell.exec('pm2 stop raw');
-    myLogger.info('pm2 stop raw Exit code:', code);
-		myLogger.info('pm2 stop raw Program output:\n', stdout);
-		myLogger.info('pm2 stop raw Program stderr:\n', stderr);
+    myLogger.logger.info('pm2 stop raw Exit code:', code);
+		myLogger.logger.info('pm2 stop raw Program output:\n', stdout);
+		myLogger.logger.info('pm2 stop raw Program stderr:\n', stderr);
     resolve(1);
   })
 }
@@ -397,9 +397,9 @@ function startRaw (){
   return new Promise((resolve,reject) => {
     // 执行 pm2 restart raw 命令
 		let {code,stdout,stderr} = shell.exec('pm2 restart raw');
-    myLogger.info('pm2 restart raw Exit code:', code);
-		myLogger.info('pm2 restart raw Program output:\n', stdout);
-		myLogger.info('pm2 restart raw Program stderr:\n', stderr);
+    myLogger.logger.info('pm2 restart raw Exit code:', code);
+		myLogger.logger.info('pm2 restart raw Program output:\n', stdout);
+		myLogger.logger.info('pm2 restart raw Program stderr:\n', stderr);
     resolve(1);
   })
 }
@@ -410,9 +410,9 @@ function adbStatus(){
     // 执行 pm2 restart raw 命令
 		let {code,stdout,stderr} = shell.exec('adb devices');
     if(stdout.indexOf(config.deviceName + '  device') == -1){
-      myLogger.info('pm2 restart raw Exit code:', code);
-		  myLogger.info('pm2 restart raw Program output:\n', stdout);
-		  myLogger.info('pm2 restart raw Program stderr:\n', stderr);
+      myLogger.logger.info('pm2 restart raw Exit code:', code);
+		  myLogger.logger.info('pm2 restart raw Program output:\n', stdout);
+		  myLogger.logger.info('pm2 restart raw Program stderr:\n', stderr);
       resolve(0);
     }else{
       resolve(1);
@@ -455,7 +455,7 @@ function redisAdd() {
 function init(_config) {
   config = _config;
   //创建日志
-  myLogger = new logger(config.project,'script');
+  myLogger.logger = new logger(config.project,'script');
 }
 
 module.exports = {

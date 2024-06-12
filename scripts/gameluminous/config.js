@@ -16,12 +16,11 @@ module.exports = {
     openChild: 70,                                                  //打开二级页面概率
     device_id: 'VM010010010092',                                   //云机ID
     availability_zone: 5,                                          //云机所在区
-    redisKey:'fillNum1',
     phoneList:[
         {
             brand: 'google',
             model: [ 'Pixel 4a', 'pixel3a', 'pixel5', 'Pixel 6' ]
         }
     ],
-    log:'gameluminous'
+    project:'gameluminous'
 }

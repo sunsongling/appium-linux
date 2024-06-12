@@ -3,6 +3,7 @@ const {remote} = require('webdriverio');
 const app  = require('../../app.js');
 const config = require('./config.js');
 const now = new Date();
+const myLogger = app.logger;
 var browser = {};
 var phoneList = config.phoneList;
 
@@ -52,8 +53,8 @@ function wait(milliSeconds) {
 
 async function runTest() {
     app.init(config);
-    app.logger.info('开始：'+now.toLocaleString());
 
+    myLogger.logger.info('开始：'+now.toLocaleString());
 
     //随机获取机型
     let phone = phoneList[Math.floor(Math.random()*phoneList.length)];
@@ -173,10 +174,10 @@ const closeWeb = async function (){
         for (let i = 0; i < windowHandles.length; i++) {
             let handle = windowHandles[i];
             await browser.switchToWindow(handle);
-            app.logger.info({'tip':`切换到窗口 ${handle}`});
+            myLogger.logger.info({'tip':`切换到窗口 ${handle}`});
             //清空所有的 cookies
             await browser.deleteCookies();
-            app.logger.info({'tip':`窗口 ${handle} Cookies 已成功清除`});
+            myLogger.logger.info({'tip':`窗口 ${handle} Cookies 已成功清除`});
             // 清空 localStorage
             await browser.execute(() => {
                 try {
@@ -185,12 +186,12 @@ const closeWeb = async function (){
                     console.log('Failed to clear localStorage:', error);
                 }
             });
-            app.logger.info({'tip':`窗口 ${handle} LocalStorage 已成功清除`});
+            myLogger.logger.info({'tip':`窗口 ${handle} LocalStorage 已成功清除`});
 
             //最后一个窗口不关闭 避免关闭所有窗口后失去上下文
             if(i < windowHandles.length - 1){
                 await browser.closeWindow();
-                app.logger.info({'tip':`窗口 ${handle} 已关闭`});
+                myLogger.logger.info({'tip':`窗口 ${handle} 已关闭`});
             }
         }
         
@@ -220,7 +221,7 @@ const closeWeb = async function (){
         //切换IP
         await app.changeIp();
 
-        app.logger.error(err);
+        myLogger.logger.error(err);
 
         restart();
     } 
@@ -310,7 +311,7 @@ const gotoAdver = async function(adver,type){
         ]
     }]);
 
-    app.logger.info({'tip':'广告点击','time':(new Date()).toLocaleString(),'type':type});
+    myLogger.logger.info({'tip':'广告点击','time':(new Date()).toLocaleString(),'type':type});
     await browser.pause(5000);
 
     let wait = Math.floor(Math.random()*15) + 15; //5-9s 
@@ -320,7 +321,7 @@ const gotoAdver = async function(adver,type){
     await browser.waitUntil(async function () {
         return (await browser.$('html body'));
     },{timeout:20000,timeoutMsg:'广告网站加载超时'});
-    app.logger.info({'tip':'广告页面加载完成','time':(new Date()).toLocaleString(),'type':type});
+    myLogger.logger.info({'tip':'广告页面加载完成','time':(new Date()).toLocaleString(),'type':type});
 
     closeWeb();
 }
@@ -329,7 +330,7 @@ const runWeb = async function(){
   
   try {
 
-    app.logger.info({tip:'打开网站',time:(new Date()).toLocaleString()});
+    myLogger.logger.info({tip:'打开网站',time:(new Date()).toLocaleString()});
     await browser.pause(10000);
 
     await browser.waitUntil(async function () {
@@ -364,7 +365,7 @@ const runWeb = async function(){
     await browser.pause(5000);
 
 
-    app.logger.info({tip:'网站已打开',time:(new Date()).toLocaleString()});
+    myLogger.logger.info({tip:'网站已打开',time:(new Date()).toLocaleString()});
    
 
     //广告
@@ -372,7 +373,7 @@ const runWeb = async function(){
     let seattlesShow = [];
     try {
         seattles = await body.$$('#adv1');
-        app.logger.info({tip:'广告曝光',time:(new Date()).toLocaleString()});
+        myLogger.logger.info({tip:'广告曝光',time:(new Date()).toLocaleString()});
 
         for(let i of seattles){
             let v = await i.isDisplayed();
@@ -385,9 +386,9 @@ const runWeb = async function(){
             }
         }
 
-        app.logger.info({tip:'广告曝光 数量'+seattlesShow.length});
+        myLogger.logger.info({tip:'广告曝光 数量'+seattlesShow.length});
     }catch (error) {
-        app.logger.info({tip:'adv1广告加载失败',time:(new Date()).toLocaleString()});
+        myLogger.logger.info({tip:'adv1广告加载失败',time:(new Date()).toLocaleString()});
         closeWeb();
     }
 
@@ -433,7 +434,7 @@ const runWeb = async function(){
             ]
         }]);
         await gameItem.click();
-        app.logger.info({tip:'进入子页面',time:(new Date()).toLocaleString()});
+        myLogger.logger.info({tip:'进入子页面',time:(new Date()).toLocaleString()});
         runChild();
         return ;
     }else{
@@ -442,7 +443,7 @@ const runWeb = async function(){
     
 
   } catch(err) {
-    app.logger.error(err);
+    myLogger.logger.error(err);
     closeWeb();
   }
 }
@@ -494,10 +495,10 @@ const runChild = async function(){
             pop = await body.$('#google_esf');
             let popV = await pop.isDisplayed();
             if(popV){
-                app.logger.info({tip:'c-pop 广告曝光',time:(new Date()).toLocaleString(),type:'c-pop'});
+                myLogger.logger.info({tip:'c-pop 广告曝光',time:(new Date()).toLocaleString(),type:'c-pop'});
             }
         }catch (error) {
-            app.logger.info({tip:'弹框没加载',time:(new Date()).toLocaleString()});
+            myLogger.logger.info({tip:'弹框没加载',time:(new Date()).toLocaleString()});
         }
 
         if(pop && popV){
@@ -521,7 +522,7 @@ const runChild = async function(){
         let seattlesShow = [];
         try {
             seattles = await body.$$('#div-gpt-ad-1715148935873-0');
-            app.logger.info({tip:'c-广告曝光',time:(new Date()).toLocaleString()});
+            myLogger.logger.info({tip:'c-广告曝光',time:(new Date()).toLocaleString()});
 
             for(let i of seattles){
                 let v = await i.isDisplayed();
@@ -532,9 +533,9 @@ const runChild = async function(){
                     break;
                 }
             }
-            app.logger.info({tip:'c-广告曝光 数量'+seattlesShow.length});
+            myLogger.logger.info({tip:'c-广告曝光 数量'+seattlesShow.length});
         }catch (error) {
-            app.logger.info({tip:'c-iframe广告加载失败',time:(new Date()).toLocaleString()});
+            myLogger.logger.info({tip:'c-iframe广告加载失败',time:(new Date()).toLocaleString()});
             closeWeb();
         }
 
@@ -552,7 +553,7 @@ const runChild = async function(){
         }
         
     }catch(err) {
-        app.logger.error(err);
+        myLogger.logger.error(err);
         closeWeb();
     }
     
