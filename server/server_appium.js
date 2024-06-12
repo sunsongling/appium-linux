@@ -23,7 +23,7 @@ function runAppium(){
         
         // 逐行输出
         output.split('\n').forEach((line) => {
-            loggerAppium.info((new Date()).toLocaleString()+' '+ line);
+            loggerAppium.info(line);
         });
     
     });
@@ -34,12 +34,12 @@ function runAppium(){
         const output = data.toString();
         // 逐行输出
         output.split('\n').forEach((line) => {
-            loggerAppium.error((new Date()).toLocaleString()+' '+ line);
+            loggerAppium.error(line);
         });
     });
 
     appium.on("close", function (code) {
-        loggerAppium.error((new Date()).toLocaleString()+' '+ code);
+        loggerAppium.error(code);
         // 重启子进程
         runAppium();
     });

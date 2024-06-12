@@ -34,7 +34,7 @@ function runRawTCP(){
             if(line.indexOf('error') !== -1){
                 restartRawTCP();
             }
-            loggerRawTCP.info((new Date()).toLocaleString()+' '+ line);
+            loggerRawTCP.info(line);
         });
     
     });
@@ -49,12 +49,12 @@ function runRawTCP(){
             if(line.indexOf('error') !== -1){
                 restartRawTCP();
             }
-            loggerRawTCP.error((new Date()).toLocaleString()+' '+ line);
+            loggerRawTCP.error(line);
         });
     });
 
     rawTCP.on("close", function (code) {
-        loggerRawTCP.error((new Date()).toLocaleString()+' '+ code);
+        loggerRawTCP.error(code);
         if(code != 0){
             // 重启子进程
             restartRawTCP();
@@ -63,7 +63,7 @@ function runRawTCP(){
 
     rawTCP.on('exit', (code, signal) => {
         if (code != 0) {
-            loggerRawTCP.error((new Date()).toLocaleString()+`RawTCP process exited with code ${code}, restarting...`);
+            loggerRawTCP.error(`RawTCP process exited with code ${code}, restarting...`);
             restartRawTCP();
         }
     });

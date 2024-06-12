@@ -18,7 +18,12 @@ function createLogger(project,fileName) {
     format: winston.format.combine(
       winston.format.timestamp(),
       winston.format.printf(({ timestamp, level, message }) => {
-        return `${timestamp} ${level}: ${message}`;
+        if(typeof message == 'object'){
+          let messageStr = JSON.stringify(message);
+          return `${timestamp} ${level}: ${messageStr}`;
+        }else{
+          return `${timestamp} ${level}: ${message}`;
+        }
       })
     ),
     transports: [

@@ -28,7 +28,7 @@ function runChild(){
         const output = data.toString();
         // 逐行输出
         output.split('\n').forEach((line) => {
-            infoLog.info((new Date()).toLocaleString()+' '+ line);
+            infoLog.info(line);
         });
     
     });
@@ -40,18 +40,18 @@ function runChild(){
         
         // 逐行输出
         output.split('\n').forEach((line) => {
-            infoLog.error((new Date()).toLocaleString()+' '+ line);
+            infoLog.error(line);
         });
     });
 
     child.on("close", function (code) {
-        infoLog.error((new Date()).toLocaleString()+"child exists with code: "+ code);
+        infoLog.error("child exists with code: "+ code);
         runChild(); // 重新启动子进程
     });
 
     child.on('exit', (code, signal) => {
         if (code !== 0) {
-          infoLog.error((new Date()).toLocaleString()+`Child process exited with code ${code}, restarting...`);
+          infoLog.error(`Child process exited with code ${code}, restarting...`);
             runChild(); // 重新启动子进程
         }
     });
