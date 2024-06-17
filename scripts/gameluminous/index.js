@@ -378,7 +378,7 @@ const runWeb = async function(){
         for(let i of seattles){
             let v = await i.isDisplayed();
             if(v){
-                await i.scrollIntoView();
+                await i.scrollIntoView({ block: 'center', inline: 'center' });
                 let wait = Math.floor(Math.random()*5) + 10; //5-9s 
                 await browser.pause(wait*1000);
                 seattlesShow.push(i);
@@ -398,13 +398,13 @@ const runWeb = async function(){
         
     if(Math.floor(Math.random()*100) < config.frequency && seattlesShow.length > 0){
         let seattle = seattlesShow[Math.floor(Math.random()*seattlesShow.length)];
-        await seattle.scrollIntoView();
+        await seattle.scrollIntoView({ block: 'center', inline: 'center' });
         gotoAdver(seattle,'adv1');
         return ;
     }else if (Math.floor(Math.random()*100) <= config.openChild){
         const gameItems = await body.$$('#main-content .games-grid-item');
         const gameItem = gameItems[Math.floor(Math.random()*gameItems.length)];
-        await gameItem.scrollIntoView();
+        await gameItem.scrollIntoView({ block: 'center', inline: 'center' });
         // 获取屏幕尺寸
         const { width, height } = await browser.getWindowSize();
 
@@ -503,7 +503,7 @@ const runChild = async function(){
 
         if(pop && popV){
             if(Math.floor(Math.random()*100) < config.frequency){
-                await pop.scrollIntoView();
+                await pop.scrollIntoView({ block: 'center', inline: 'center' });
                 gotoAdver(pop,'c-pop');
                 return;
             }else{
@@ -544,7 +544,7 @@ const runChild = async function(){
 
         if(Math.floor(Math.random()*100) < config.frequency && seattlesShow.length > 0){
             let seattle = seattlesShow[Math.floor(Math.random()*seattlesShow.length)];
-            await seattle.scrollIntoView();
+            await seattle.scrollIntoView({ block: 'center', inline: 'center' });
             gotoAdver(seattle,'c-iframe');
             return ;
         }else{
